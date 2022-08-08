@@ -33,43 +33,44 @@ class checkCircuitBreaker_1(Resource):
         # return Response(response, content_type='text/xml; charset=utf-8') ,200
         return circuit_breaker_demo_1(), 200
 
-#method used to search a measurement based on measurement id.
-@serviceNameAPI.route('/method')
-class SampleController(Resource): 
-    # @token_required
-    # @cache.cached(timeout=1000)   
-    def get(self):
-        return  delegate_function(), 200
+time_breaker = pybreaker.CircuitBreaker(fail_max=3, reset_timeout=3.0)
+time_breaker.add_listeners(LogListener(app))
 
+# @time_breaker
+# def get_circuit_data(send):
+#     try:
+#         resp = requests.get(send,timeout=3.0)
+#     except (requests.exceptions.ConnectionError,
+#         requests.exceptions.Timeout):              
+#         raise pybreaker.CircuitBreakerError
+#     return json.loads(resp.text)
 
-@serviceNameAPI.route('/method1')
-class five_o__fiveController(Resource): 
-    # @token_required
-    # @cache.cached(timeout=1000)
-    def get(self):
-        return  '',500
+@time_breaker
+@retry(stop_max_attempt_number=3)
+def circuit_breaker_demo():
+    # send = 'https://daedalusdataservice.taspre-phx-mtls.apps.boeing.com/api/daedalusdataservice/measurements'
+    
+    try:
+        resp = requests.get('https://daedalusdataservice.taspre-phx-mtls.apps.boeing.com/api/daedalusdataservice/measurements',timeout=3.0)
+       
+    except (requests.exceptions.ConnectionError,
+        requests.exceptions.Timeout):              
+        raise pybreaker.CircuitBreakerError
+    print(time_breaker.current_state)
+    # if time_breaker.open:
+        
+    return json.loads(resp.text)
+    # return get_circuit_data(send)
 
-
-@serviceNameAPI.route('/method2')
-class fouroo_Controller(Resource): 
-    # @token_required
-    # @cache.cached(timeout=1000)
-    def get(self):
-        return  '',400
-
-
-
-@serviceNameAPI.route('/method3')
-class fouroone_Controller(Resource): 
-    # @token_required
-    # @cache.cached(timeout=1000)
-    def get(self):
-        return  '',401
-
-
-@serviceNameAPI.route('/method4')
-class fourothree_Controller(Resource): 
-    # @token_required
-    # @cache.cached(timeout=1000)
-    def get(self):
-        return  '',403
+@time_breaker
+@retry(stop_max_attempt_number=2)
+def circuit_breaker_demo_1():
+    # send='https://daedalusdataservice.taspre-phx-mtls.apps.boeing.com/api/daedalusdataservice/measurements/measurements?ids=4401007'
+    
+    try:
+        resp = requests.get('https://daedalusdataservice.taspre-phx-mtls.apps.boeing.com/api/daedalusdataservice/measurements/measurements?ids=4401007',timeout=3.0)
+    except (requests.exceptions.ConnectionError,
+        requests.exceptions.Timeout):              
+        raise pybreaker.CircuitBreakerError
+    
+    return json.loads(resp.text)
