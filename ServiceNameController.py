@@ -35,7 +35,7 @@ class checkCircuitBreaker_1(Resource):
 time_breaker = pybreaker.CircuitBreaker(fail_max=3, reset_timeout=3.0)
 time_breaker.add_listeners(LogListener(app))
 
-
+#------------------------Called Functions---------------------------
 
 @time_breaker
 @retry(stop_max_attempt_number=3)
