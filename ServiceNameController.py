@@ -42,7 +42,7 @@ time_breaker.add_listeners(LogListener(app))
 def circuit_breaker_demo():
     
     try:
-        resp = requests.get('https://daedalusdataservice.taspre-phx-mtls.apps.boeing.com/api/daedalusdataservice/measurements',timeout=3.0)
+        resp = requests.get('https://taspre-phx-mtls.apps.com/api/dataservice/measurements',timeout=3.0)
        
     except (requests.exceptions.ConnectionError,
         requests.exceptions.Timeout):              
@@ -54,7 +54,7 @@ def circuit_breaker_demo():
 @retry(stop_max_attempt_number=2)
 def circuit_breaker_demo_1():
     try:
-        resp = requests.get('https://daedalusdataservice.taspre-phx-mtls.apps.boeing.com/api/daedalusdataservice/measurements/measurements?ids=4401007',timeout=3.0)
+        resp = requests.get('https://taspre-phx-mtls.apps.com/api/measurements?ids=4401007',timeout=3.0)
     except (requests.exceptions.ConnectionError,
         requests.exceptions.Timeout):              
         raise pybreaker.CircuitBreakerError
